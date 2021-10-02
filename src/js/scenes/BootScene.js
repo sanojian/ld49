@@ -10,7 +10,11 @@ class BootScene extends Phaser.Scene {
 
     preload() {
 
-        this.load.audio('music1', '/dist/assets/audio/Chemical_track1.mp3');
+
+      this.load.image('chem1_source', '/dist/assets/gfx/chem1.png');
+      this.load.image('chem2_source', '/dist/assets/gfx/chem2.png');
+
+      this.load.audio('music1', '/dist/assets/audio/Chemical_track1.mp3');
 
     }
 

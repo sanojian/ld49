@@ -12,12 +12,13 @@ function initGame() {
 
   const config = {
     parent: 'gameDiv',
-    width: 32 * 16,
-    height: 32 * 9,
+    width: 16 * 16,
+    height: 16 * 9,
     scale: {
       mode: Phaser.Scale.FIT
     },
     autoCenter: true,
+    backgroundColor: 0xeeeeee,
     scene: [BootScene, PlayScene, UIScene],
     dom: {
       createContainer: false
