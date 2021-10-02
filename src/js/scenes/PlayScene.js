@@ -38,12 +38,10 @@ class PlayScene extends Phaser.Scene {
 
 				if (chem1ButtonDown) {
 					let cell = world.grid[0][8];
-					cell.amt = 1;
 					cell.type = 1;
 				}
 				if (chem2ButtonDown) {
 					let cell = world.grid[0][24];
-					cell.amt = 1;
 					cell.type = 2;
 				}
 				this.redrawContents(world, graphics);
@@ -64,7 +62,7 @@ class PlayScene extends Phaser.Scene {
 		});
 
 		let colors = {
-			empty: 0xeeeeee,
+			0: 0xeeeeee,
 			1: 0x6fedf4,
 			2: 0xf46a45,
 			3: 0xdc96f4
@@ -72,40 +70,36 @@ class PlayScene extends Phaser.Scene {
 
 		world.registerCellType('water', {
 			getColor: function() {
-				if (this.amt === 0) {
-					return colors.empty;
-				}
-
 				return colors[this.type];
 			},
-			pushToEmptyNeighbor: function(left, right) {
-				// both empty
-				if (this.amt && left && left.amt === 0 && right && right.amt === 0) {
-					this.amt = 0;
+			pushTolighterNeighbor: function(left, right) {
+
+				let temp = this.type;
+
+				// both lighter
+				if (left && left.type < this.type && right && right.type < this.type) {
 					if (Math.random() > 0.5) {
-						left.amt = 1;
-						left.type = this.type;
+						this.type = left.type;
+						left.type = temp;
 					}
 					else {
-						right.amt = 1;
-						right.type = this.type;
+						this.type = right.type;
+						right.type = temp;
 					}
 				}
-				else if (this.amt && left && left.amt === 0) {
-					this.amt = 0;
-					left.amt = 1;
-					left.type = this.type;
+				else if (left && left.type < this.type) {
+					this.type = left.type;
+					left.type = temp;
 				}
-				else if (this.amt && right && right.amt === 0) {
-					this.amt = 0;
-					right.amt = 1;
-					right.type = this.type;
+				else if (right && right.type < this.type) {
+					this.type = right.type;
+					right.type = temp;
 				}
 
 			},
 			reactWithNeighbor: function(left, right) {
 
-				if (this.amt && left && left.amt) {
+				if (left) {
 					if (this.type == 1 && left.type == 2) {
 						this.type = 3;
 						left.type = 3;
@@ -115,7 +109,7 @@ class PlayScene extends Phaser.Scene {
 						left.type = 3;
 					}
 				}
-				else if (this.amt && right && right.amt) {
+				else if (right) {
 					if (this.type == 1 && right.type == 2) {
 						this.type = 3;
 						right.type = 3;
@@ -127,7 +121,7 @@ class PlayScene extends Phaser.Scene {
 				}
 			},
 			process: function(neighbors) {
-				if (this.amt === 0) {
+				if (this.type === 0) {
 					// already empty
 					return;
 				}
@@ -139,19 +133,19 @@ class PlayScene extends Phaser.Scene {
 				// push my contents out to my empty below neighbors
 
 				// push to bottom first
-				this.pushToEmptyNeighbor(neighbors[world.BOTTOM.index]);
+				this.pushTolighterNeighbor(neighbors[world.BOTTOM.index]);
 
 				// push to lower left or right
-				this.pushToEmptyNeighbor(neighbors[world.BOTTOMLEFT.index], neighbors[world.BOTTOMRIGHT.index]);
+				this.pushTolighterNeighbor(neighbors[world.BOTTOMLEFT.index], neighbors[world.BOTTOMRIGHT.index]);
 
 				// push to left or right if still contents
-				this.pushToEmptyNeighbor(neighbors[world.LEFT.index], neighbors[world.RIGHT.index]);
+				this.pushTolighterNeighbor(neighbors[world.LEFT.index], neighbors[world.RIGHT.index]);
 			}
 		}, function() {
 			//init
-			this.amt = Math.random() < 0 ? 1 : 0;
+			this.type = Math.random() < 0 ? 1 : 0;
 
-			if (this.amt) {
+			if (this.type) {
 				this.type = Math.random() < 0 ? 1 : 2;
 			}
 
