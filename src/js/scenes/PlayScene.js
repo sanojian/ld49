@@ -12,24 +12,18 @@ class PlayScene extends Phaser.Scene {
 
 		let world = this.initWorld();
 
-		let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
-
-		let reactor = this.add.image(this.sys.game.scale.gameSize.width/4, this.sys.game.scale.gameSize.height/2, 'reactor').setScale(g_game.DEFS.SCALE);
+		//let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		let vat_reactor = this.add.image(34 * g_game.DEFS.SCALE, 63 * g_game.DEFS.SCALE, 'vat_reactor').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 
 		var graphics = this.add.graphics({
 			x: this.sys.game.scale.gameSize.width/2,
 			y: this.sys.game.scale.gameSize.height/2
 		}).setScale(g_game.DEFS.SCALE);
 
-		let valveFuel = this.add.image(vat.x + 17 * g_game.DEFS.SCALE, vat.y + 52 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		let valveFuel = this.add.image(vat_reactor.x + 82 * g_game.DEFS.SCALE, vat_reactor.y + 39 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 		valveFuel.setInteractive({ useHandCursor: true });
 		valveFuel.on('pointerdown', () => {
 			this.nextFuelBall = 'FUEL';
-		});
-		let valveCool = this.add.image(vat.x + 53 * g_game.DEFS.SCALE, vat.y + 52 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
-		valveCool.setInteractive({ useHandCursor: true });
-		valveFuel.on('pointerdown', () => {
-			this.nextFuelBall = 'COOL';
 		});
 
 		let chem1ButtonDown = false;
@@ -77,9 +71,7 @@ class PlayScene extends Phaser.Scene {
 							if (y < 2) {
 								world.grid[y][x].type = 10;
 							}
-							else {
-								world.grid[y+2][x].type = world.grid[y][x].type;
-							}
+							world.grid[y+2][x].type = world.grid[y][x].type;
 						}
 					}
 
@@ -152,30 +144,11 @@ class PlayScene extends Phaser.Scene {
 		e51c23	9
 		*/
 
-		let colors = {
-			1: 0x333333,
-			// air
-			10: 0xeeeeee,	// airium
-			// base
-			11: 0xffeb3b,	// hydorium
-			12: 0x259b24,	// oxxum
-			13: 0x90a4ae,	// chlorium
-			// compounds
-			14: 0x03a9f4,	// 3
-			15: 0x4e6cef,	// 4
-			16: 0x8e24aa,	// 5
-			17: 0xf48fb1,	// 6
-			18: 0xf06292,	// 7
-			19: 0xf36c60,	// 8
-			20: 0x00bcd4,	// 2
-			21: 0x81d4fa,	// 1
-			22: 0xe51c23	// 9
-		};
-
 
 		world.registerCellType('water', {
 			getColor: function() {
-				return colors[this.type];
+				//return colors[this.type];
+				return g_game.DEFS.ELEMENTS[this.type].color;
 			},
 			pushTolighterNeighbor: function(left, right) {
 

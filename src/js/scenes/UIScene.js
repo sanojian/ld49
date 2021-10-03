@@ -52,6 +52,9 @@ class UIScene extends Phaser.Scene {
 
     }
 
+    style.fontSize = '40px';
+
+    this.add.text(54 * g_game.DEFS.SCALE, 20 * g_game.DEFS.SCALE, 'Chain \n  Reactor', style).setOrigin(0.5, 0.5);
 
     this.music1 = this.sound.add('music1');
     this.music2 = this.sound.add('music2');
