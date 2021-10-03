@@ -13,7 +13,7 @@ class UIScene extends Phaser.Scene {
 
     var style = {
       fontFamily: 'Conv_ladybug px',
-      fontSize: '7px',
+      fontSize: '9px',
       color: '#333333'
     };
 

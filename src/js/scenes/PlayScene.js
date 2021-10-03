@@ -15,57 +15,79 @@ class PlayScene extends Phaser.Scene {
 		//let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 		let vat_reactor = this.add.image(34 * g_game.DEFS.SCALE, 63 * g_game.DEFS.SCALE, 'vat_reactor').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 
+		this.tempGuage = this.add.image(vat_reactor.x + 18 * g_game.DEFS.SCALE, vat_reactor.y + 22 * g_game.DEFS.SCALE, 'toxic').setScale(g_game.DEFS.SCALE);
+		this.currentTemp = 50;
+		this.updateTempGuage();
+
 		var graphics = this.add.graphics({
 			x: this.sys.game.scale.gameSize.width/2,
 			y: this.sys.game.scale.gameSize.height/2
 		}).setScale(g_game.DEFS.SCALE);
 
-		let valveFuel = this.add.image(vat_reactor.x + 82 * g_game.DEFS.SCALE, vat_reactor.y + 39 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		let valveFuel = this.add.image(vat_reactor.x + 88 * g_game.DEFS.SCALE, vat_reactor.y + 54 * g_game.DEFS.SCALE, 'valve').setOrigin(0.5, 1).setScale(g_game.DEFS.SCALE);
 		valveFuel.setInteractive({ useHandCursor: true });
 		valveFuel.on('pointerdown', () => {
 			this.nextFuelBall = 'FUEL';
+			if (this.valveTween) {
+				this.valveTween.stop();
+				valveFuel.setScale(g_game.DEFS.SCALE);
+			}
 		});
 
 		let chem1ButtonDown = false;
-		let chem1Button = this.add.image(graphics.x + 8 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE);
+		let chem1Button = this.add.image(vat_reactor.x + 184 * g_game.DEFS.SCALE, vat_reactor.y + 19 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem2ButtonDown = false;
-		let chem2Button = this.add.image(graphics.x + 24 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem2_source').setScale(g_game.DEFS.SCALE);
+		let chem2Button = this.add.image(chem1Button.x, chem1Button.y + 12 * g_game.DEFS.SCALE, 'chem2_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem3ButtonDown = false;
-		let chem3Button = this.add.image(graphics.x + 40 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem3_source').setScale(g_game.DEFS.SCALE);
-		let chem4ButtonDown = false;
-		let chem4Button = this.add.image(graphics.x + 56 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem4_source').setVisible(false);
+		let chem3Button = this.add.image(chem1Button.x, chem1Button.y + 24 * g_game.DEFS.SCALE, 'chem3_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 
+		var style = {
+      fontFamily: 'Conv_ladybug px',
+      fontSize: '9px',
+      color: '#333333'
+    };
 
 		chem1Button.setInteractive({ useHandCursor: true});
 		chem1Button.on('pointerdown', () => { chem1ButtonDown = true;	}, this);
 		chem1Button.on('pointerout', () => { chem1ButtonDown = false; }, this);
 		chem1Button.on('pointerup', () => { chem1ButtonDown = false; }, this);
+		this.add.text(chem1Button.x+8 * g_game.DEFS.SCALE, chem1Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[11].name, style).setOrigin(0.5, 0.5);
 		chem2Button.setInteractive({ useHandCursor: true});
 		chem2Button.on('pointerdown', () => { chem2ButtonDown = true;	}, this);
 		chem2Button.on('pointerout', () => { chem2ButtonDown = false; }, this);
 		chem2Button.on('pointerup', () => { chem2ButtonDown = false; }, this);
+		this.add.text(chem2Button.x+8 * g_game.DEFS.SCALE, chem2Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[12].name, style).setOrigin(0.5, 0.5);
 		chem3Button.setInteractive({ useHandCursor: true});
 		chem3Button.on('pointerdown', () => { chem3ButtonDown = true;	}, this);
 		chem3Button.on('pointerout', () => { chem3ButtonDown = false; }, this);
 		chem3Button.on('pointerup', () => { chem3ButtonDown = false; }, this);
-		chem4Button.setInteractive({ useHandCursor: true});
-		chem4Button.on('pointerdown', () => { chem4ButtonDown = true;	}, this);
-		chem4Button.on('pointerout', () => { chem4ButtonDown = false; }, this);
-		chem4Button.on('pointerup', () => { chem4ButtonDown = false; }, this);
+		this.add.text(chem3Button.x+8 * g_game.DEFS.SCALE, chem3Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[13].name, style).setOrigin(0.5, 0.5);
 
 		this.time.addEvent({
 			delay: 100,
 			callback: () => {
 
 				if (this.nextFuelBall) {
-					// take bottom two rows of vat and shift rest down
+					let valueCount = 0;
+					let heat = 0;
 					for (let y = world.height - 3; y < world.height; y++) {
 						for (let x = 0; x < world.width; x++) {
 							// average heat values
+							let cell = world.grid[y][x];
+							let element = g_game.DEFS.ELEMENTS[cell.type];
+							if (element.heat !== -1) {
+								heat += element.heat;
+								valueCount++;
+							}
+						}
+						if (valueCount) {
+							let avg = heat / valueCount;
+							this.currentTemp = avg * 10;
+							this.updateTempGuage();
 						}
 					}
 
-					// shift bottom rows
+					// take bottom two rows of vat and shift rest down
 					for (let y = world.height - 3; y >= 0; y--) {
 						for (let x = 0; x < world.width; x++) {
 							if (y < 2) {
@@ -79,20 +101,25 @@ class PlayScene extends Phaser.Scene {
 				}
 
 				if (chem1ButtonDown) {
-					let cell = world.grid[0][8 / world.cellSize];
+					let cell = world.grid[0][world.width/2];
 					cell.type = 11;
+					if (!this.valveTween) {
+						this.startValveAnim(valveFuel);
+					}
 				}
 				if (chem2ButtonDown) {
-					let cell = world.grid[0][24 / world.cellSize];
+					let cell = world.grid[0][world.width/2];
 					cell.type = 12;
+					if (!this.valveTween) {
+						this.startValveAnim(valveFuel);
+					}
 				}
 				if (chem3ButtonDown) {
-					let cell = world.grid[0][40 / world.cellSize];
+					let cell = world.grid[0][world.width/2];
 					cell.type = 13;
-				}
-				if (chem4ButtonDown) {
-					let cell = world.grid[0][56 / world.cellSize];
-					cell.type = 14;
+					if (!this.valveTween) {
+						this.startValveAnim(valveFuel);
+					}
 				}
 				this.redrawContents(world, graphics);
 				world.step();
@@ -258,6 +285,27 @@ class PlayScene extends Phaser.Scene {
 		]);
 
 		return world;
+	}
+
+	startValveAnim(valveFuel) {
+		this.valveTween = this.tweens.add({
+			targets: valveFuel,
+			scaleX: g_game.DEFS.SCALE * 1.4,
+			scaleY: g_game.DEFS.SCALE * 1.4,
+			duration: 500,
+			yoyo: true,
+			repeat: -1
+		});
+	}
+
+	updateTempGuage() {
+
+		let value = Math.round(this.currentTemp / 10);
+
+		let color = g_game.DEFS.HEATCOLORS[value-1];
+
+		this.tempGuage.setTint(color);
+
 	}
 
 	redrawContents(world, graphics) {
