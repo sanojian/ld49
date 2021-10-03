@@ -12,19 +12,23 @@ class PlayScene extends Phaser.Scene {
 
 		let world = this.initWorld();
 
+		this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+
+		let reactor = this.add.image(this.sys.game.scale.gameSize.width/4, this.sys.game.scale.gameSize.height/2, 'reactor').setScale(g_game.DEFS.SCALE);
+
 		var graphics = this.add.graphics({
 			x: this.sys.game.scale.gameSize.width/2,
 			y: this.sys.game.scale.gameSize.height/2
-		});
+		}).setScale(g_game.DEFS.SCALE);
 
 		let chem1ButtonDown = false;
-		let chem1Button = this.add.image(graphics.x + 8, graphics.y - 8, 'chem1_source');
+		let chem1Button = this.add.image(graphics.x + 8 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE);
 		let chem2ButtonDown = false;
-		let chem2Button = this.add.image(graphics.x + 24, graphics.y - 8, 'chem2_source');
+		let chem2Button = this.add.image(graphics.x + 24 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem2_source').setScale(g_game.DEFS.SCALE);
 		let chem3ButtonDown = false;
-		let chem3Button = this.add.image(graphics.x + 40, graphics.y - 8, 'chem3_source');
+		let chem3Button = this.add.image(graphics.x + 40 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem3_source').setScale(g_game.DEFS.SCALE);
 		let chem4ButtonDown = false;
-		let chem4Button = this.add.image(graphics.x + 56, graphics.y - 8, 'chem4_source').setVisible(false);
+		let chem4Button = this.add.image(graphics.x + 56 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem4_source').setVisible(false);
 
 
 		chem1Button.setInteractive({ useHandCursor: true});
@@ -71,12 +75,7 @@ class PlayScene extends Phaser.Scene {
 			repeat: -1
 		});
 
-		this.sounds = {};
-		this.sounds.music1 = this.sound.add('music1');
-		this.sounds.music2 = this.sound.add('music2');
-
-		//this.sounds.music2.play({ loop: true, volume: 0.6 });
-
+		this.scene.bringToTop('UIScene');
 
 	}
 

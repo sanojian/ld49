@@ -12,8 +12,8 @@ function initGame() {
 
   const config = {
     parent: 'gameDiv',
-    width: 16 * 16,
-    height: 16 * 9,
+    width: 16 * 16 * g_game.DEFS.SCALE,
+    height: 16 * 9 * g_game.DEFS.SCALE,
     scale: {
       mode: Phaser.Scale.FIT
     },
@@ -23,9 +23,10 @@ function initGame() {
     dom: {
       createContainer: false
     },
-    render: {
-      antialias: true
-    }
+    pixelArt: true,
+    /*render: {
+      antialias: false
+    }*/
   };
 
   new Phaser.Game(config);

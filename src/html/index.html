@@ -15,7 +15,7 @@
             margin:0;
             background-color: #ccc;
         }
-        canvas {
+        html, body, canvas {
             image-rendering:optimizeSpeed;            /* Legal fallback */
             image-rendering:-moz-crisp-edges;          /* Firefox        */
             image-rendering:-o-crisp-edges;            /* Opera          */
@@ -38,5 +38,6 @@
 
 </head>
 <body onload="initGame()">
+  <div class="gameFont" style="position: absolute; left: -1000px;">hello</div>
 </body>
 </html>
