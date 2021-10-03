@@ -82,7 +82,8 @@ class PlayScene extends Phaser.Scene {
 						}
 						if (valueCount) {
 							let avg = heat / valueCount;
-							this.currentTemp = avg * 10;
+							let influence = valueCount / (world.width * 2);
+							this.currentTemp = (this.currentTemp + (avg * 10) * influence) / (1 + influence);
 							this.updateTempGuage();
 						}
 					}
