@@ -23,6 +23,8 @@ g_game.DEFS = {
   },
 
   ELEMENTS: {
+    // air
+    10: { color: 0xeeeeee,	heat: -1, name: 'airium' },
     // base
     11: { color: 0xffeb3b,	heat: -1, name: 'hydorium' },
     12: { color: 0x259b24,	heat: -1, name: 'oxxum' },

@@ -12,7 +12,7 @@ class PlayScene extends Phaser.Scene {
 
 		let world = this.initWorld();
 
-		this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 
 		let reactor = this.add.image(this.sys.game.scale.gameSize.width/4, this.sys.game.scale.gameSize.height/2, 'reactor').setScale(g_game.DEFS.SCALE);
 
@@ -20,6 +20,17 @@ class PlayScene extends Phaser.Scene {
 			x: this.sys.game.scale.gameSize.width/2,
 			y: this.sys.game.scale.gameSize.height/2
 		}).setScale(g_game.DEFS.SCALE);
+
+		let valveFuel = this.add.image(vat.x + 17 * g_game.DEFS.SCALE, vat.y + 52 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		valveFuel.setInteractive({ useHandCursor: true });
+		valveFuel.on('pointerdown', () => {
+			this.nextFuelBall = 'FUEL';
+		});
+		let valveCool = this.add.image(vat.x + 53 * g_game.DEFS.SCALE, vat.y + 52 * g_game.DEFS.SCALE, 'valve').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		valveCool.setInteractive({ useHandCursor: true });
+		valveFuel.on('pointerdown', () => {
+			this.nextFuelBall = 'COOL';
+		});
 
 		let chem1ButtonDown = false;
 		let chem1Button = this.add.image(graphics.x + 8 * g_game.DEFS.SCALE, graphics.y - 8 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE);
@@ -51,6 +62,29 @@ class PlayScene extends Phaser.Scene {
 		this.time.addEvent({
 			delay: 100,
 			callback: () => {
+
+				if (this.nextFuelBall) {
+					// take bottom two rows of vat and shift rest down
+					for (let y = world.height - 3; y < world.height; y++) {
+						for (let x = 0; x < world.width; x++) {
+							// average heat values
+						}
+					}
+
+					// shift bottom rows
+					for (let y = world.height - 3; y >= 0; y--) {
+						for (let x = 0; x < world.width; x++) {
+							if (y < 2) {
+								world.grid[y][x].type = 10;
+							}
+							else {
+								world.grid[y+2][x].type = world.grid[y][x].type;
+							}
+						}
+					}
+
+					this.nextFuelBall = null;
+				}
 
 				if (chem1ButtonDown) {
 					let cell = world.grid[0][8 / world.cellSize];
