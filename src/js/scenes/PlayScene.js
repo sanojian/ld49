@@ -89,19 +89,28 @@ class PlayScene extends Phaser.Scene {
 		let chem3Button = this.add.image(chem1Button.x, chem1Button.y + 24 * g_game.DEFS.SCALE, 'chem3_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 
 		chem1Button.setInteractive({ useHandCursor: true});
-		chem1Button.on('pointerdown', () => { chem1ButtonDown = true;	}, this);
-		chem1Button.on('pointerout', () => { chem1ButtonDown = false; }, this);
-		chem1Button.on('pointerup', () => { chem1ButtonDown = false; }, this);
+		chem1Button.on('pointerdown', () => {
+			chem1ButtonDown = true;
+			this.sounds.pour.play({ loop: true });
+		}, this);
+		chem1Button.on('pointerout', () => {
+			chem1ButtonDown = false;
+			this.sounds.pour.stop();
+		}, this);
+		chem1Button.on('pointerup', () => {
+			chem1ButtonDown = false;
+			this.sounds.pour.stop();
+		}, this);
 		this.add.text(chem1Button.x+8 * g_game.DEFS.SCALE, chem1Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[11].name, style).setOrigin(0.5, 0.5);
 		chem2Button.setInteractive({ useHandCursor: true});
-		chem2Button.on('pointerdown', () => { chem2ButtonDown = true;	}, this);
-		chem2Button.on('pointerout', () => { chem2ButtonDown = false; }, this);
-		chem2Button.on('pointerup', () => { chem2ButtonDown = false; }, this);
+		chem2Button.on('pointerdown', () => { chem2ButtonDown = true;	this.sounds.pour.play({ loop: true });}, this);
+		chem2Button.on('pointerout', () => { chem2ButtonDown = false; this.sounds.pour.stop();}, this);
+		chem2Button.on('pointerup', () => { chem2ButtonDown = false; this.sounds.pour.stop();}, this);
 		this.add.text(chem2Button.x+8 * g_game.DEFS.SCALE, chem2Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[12].name, style).setOrigin(0.5, 0.5);
 		chem3Button.setInteractive({ useHandCursor: true});
-		chem3Button.on('pointerdown', () => { chem3ButtonDown = true;	}, this);
-		chem3Button.on('pointerout', () => { chem3ButtonDown = false; }, this);
-		chem3Button.on('pointerup', () => { chem3ButtonDown = false; }, this);
+		chem3Button.on('pointerdown', () => { chem3ButtonDown = true;	this.sounds.pour.play({ loop: true });}, this);
+		chem3Button.on('pointerout', () => { chem3ButtonDown = false; this.sounds.pour.stop();}, this);
+		chem3Button.on('pointerup', () => { chem3ButtonDown = false; this.sounds.pour.stop();}, this);
 		this.add.text(chem3Button.x+8 * g_game.DEFS.SCALE, chem3Button.y+4 * g_game.DEFS.SCALE, g_game.DEFS.ELEMENTS[13].name, style).setOrigin(0.5, 0.5);
 
 		this.time.addEvent({
@@ -161,6 +170,7 @@ class PlayScene extends Phaser.Scene {
 		});
 
 		this.sounds = {
+			pour: this.sound.add('pour'),
 			nada: this.sound.add('nada'),
 			burn: this.sound.add('burn'),
 			hiss: this.sound.add('hiss')

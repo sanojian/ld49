@@ -27,6 +27,7 @@ class BootScene extends Phaser.Scene {
       this.load.audio('burn', '/dist/assets/audio/Explosion9.mp3');
       this.load.audio('hiss', '/dist/assets/audio/hiss.mp3');
       this.load.audio('nada', '/dist/assets/audio/nada.mp3');
+      this.load.audio('pour', '/dist/assets/audio/pour.mp3');
 
 
     }
