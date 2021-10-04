@@ -39,8 +39,8 @@ g_game.DEFS = {
     12: { color: 0x259b24,	heat: -1, name: 'oxxum' },
     13: { color: 0x90a4ae,	heat: -1, name: 'klorum' },
     // compounds
-    14: { color: 0x03a9f4,	heat: 3, name: 'coldium' },
-    15: { color: 0x4e6cef,	heat: 4, name: 'coolium' },
+    14: { color: 0x03a9f4,	heat: 3, name: 'coolium' },
+    15: { color: 0x4e6cef,	heat: 4, name: 'coldium' },
     16: { color: 0x8e24aa,	heat: 5, name: 'neutrium' },
     17: { color: 0xf48fb1,	heat: 6, name: 'warmium' },
     18: { color: 0xf06292,	heat: 7, name: 'hotium' },

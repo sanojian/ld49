@@ -10,6 +10,12 @@ class PlayScene extends Phaser.Scene {
 
 	create() {
 
+		var style = {
+      fontFamily: 'Conv_ladybug px',
+      fontSize: '9px',
+      color: '#333333'
+    };
+
 		let world = this.initWorld();
 
 		//let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
@@ -34,18 +40,48 @@ class PlayScene extends Phaser.Scene {
 			}
 		});
 
+		this.fuelName = this.add.text(vat_reactor.x + 52 * g_game.DEFS.SCALE, vat_reactor.y + 34 * g_game.DEFS.SCALE, 'test', style).setVisible(false);
+
+		this.fuelBlocks = [];
+		this.fuelQueue = [];
+		for (let i = 0; i < 11; i++) {
+			let block = this.add.image(vat_reactor.x + 32 * g_game.DEFS.SCALE + i*5* g_game.DEFS.SCALE, vat_reactor.y + 54 * g_game.DEFS.SCALE, 'block').setOrigin(0, 1).setScale(g_game.DEFS.SCALE).setVisible(false);
+			this.fuelBlocks.push(block);
+		}
+
+		this.time.addEvent({
+			delay: 1000,
+			callback: () => {
+				this.updateFuelQueue();
+				this.fuelName.setVisible(false);
+				if (this.fuelQueue.length) {
+					this.fuelName.setText(this.fuelQueue[0].name).setVisible(true);
+					this.tweens.add({
+						targets: this.fuelBlocks[0],
+						rotation: -3*Math.PI/4,
+						duration: 300,
+						easing: 'Quad.easeOut',
+						onComplete: () => {
+							// feed fuel
+							this.fuelQueue.shift();
+							this.updateFuelQueue();
+							this.fuelBlocks[0].setRotation(0);
+						},
+						onCompleteScope: this
+					});
+				}
+			},
+			callbackScope: this,
+			repeat: -1
+		});
+
+
 		let chem1ButtonDown = false;
 		let chem1Button = this.add.image(vat_reactor.x + 184 * g_game.DEFS.SCALE, vat_reactor.y + 19 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem2ButtonDown = false;
 		let chem2Button = this.add.image(chem1Button.x, chem1Button.y + 12 * g_game.DEFS.SCALE, 'chem2_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem3ButtonDown = false;
 		let chem3Button = this.add.image(chem1Button.x, chem1Button.y + 24 * g_game.DEFS.SCALE, 'chem3_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
-
-		var style = {
-      fontFamily: 'Conv_ladybug px',
-      fontSize: '9px',
-      color: '#333333'
-    };
 
 		chem1Button.setInteractive({ useHandCursor: true});
 		chem1Button.on('pointerdown', () => { chem1ButtonDown = true;	}, this);
@@ -70,35 +106,25 @@ class PlayScene extends Phaser.Scene {
 				if (this.nextFuelBall) {
 					let valueCount = 0;
 					let heat = 0;
-					for (let y = world.height - 3; y < world.height; y++) {
-						for (let x = 0; x < world.width; x++) {
-							// average heat values
-							let cell = world.grid[y][x];
-							let element = g_game.DEFS.ELEMENTS[cell.type];
-							if (element.heat !== -1) {
-								heat += element.heat;
-								valueCount++;
-							}
-						}
-						if (valueCount) {
-							let avg = heat / valueCount;
-							let influence = valueCount / (world.width * 2);
-							this.currentTemp = (this.currentTemp + (avg * 10) * influence) / (1 + influence);
-							this.updateTempGuage();
-						}
+					for (let x = 0; x < world.width; x++) {
+						// average heat values
+						let cell = world.grid[world.height-1][x];
+						let element = g_game.DEFS.ELEMENTS[cell.type];
+						this.fuelQueue.push(element);
 					}
 
 					// take bottom two rows of vat and shift rest down
-					for (let y = world.height - 3; y >= 0; y--) {
+					for (let y = world.height - 2; y >= 0; y--) {
 						for (let x = 0; x < world.width; x++) {
-							if (y < 2) {
+							if (y < 1) {
 								world.grid[y][x].type = 10;
 							}
-							world.grid[y+2][x].type = world.grid[y][x].type;
+							world.grid[y+1][x].type = world.grid[y][x].type;
 						}
 					}
 
 					this.nextFuelBall = null;
+					this.updateFuelQueue();
 				}
 
 				if (chem1ButtonDown) {
@@ -131,6 +157,18 @@ class PlayScene extends Phaser.Scene {
 
 		this.scene.bringToTop('UIScene');
 
+	}
+
+	updateFuelQueue() {
+		for (let i = 0; i < 11; i++) {
+			if (this.fuelQueue[i]) {
+				this.fuelBlocks[i].setTint(this.fuelQueue[i].color);
+				this.fuelBlocks[i].setVisible(true);
+			}
+			else {
+				this.fuelBlocks[i].setVisible(false);
+			}
+		}
 	}
 
 	initWorld() {
