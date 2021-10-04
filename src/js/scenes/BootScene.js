@@ -19,9 +19,15 @@ class BootScene extends Phaser.Scene {
       this.load.image('vat_reactor', '/dist/assets/gfx/vat_reactor.png');
       this.load.image('toxic', '/dist/assets/gfx/toxic_symbol.png');
       this.load.image('block', '/dist/assets/gfx/block.png');
+      this.load.image('thermo', '/dist/assets/gfx/thermo.png');
+      this.load.image('thermo_contents', '/dist/assets/gfx/thermo_contents.png');
 
       this.load.audio('music1', '/dist/assets/audio/Chemical_track1.mp3');
       this.load.audio('music2', '/dist/assets/audio/Chemical_track2.mp3');
+      this.load.audio('burn', '/dist/assets/audio/Explosion9.mp3');
+      this.load.audio('hiss', '/dist/assets/audio/hiss.mp3');
+      this.load.audio('nada', '/dist/assets/audio/nada.mp3');
+
 
     }
 

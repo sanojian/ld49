@@ -18,8 +18,12 @@ class PlayScene extends Phaser.Scene {
 
 		let world = this.initWorld();
 
-		//let vat = this.add.image(this.sys.game.scale.gameSize.width/2 - 5 * g_game.DEFS.SCALE, this.sys.game.scale.gameSize.height/2 - 4* g_game.DEFS.SCALE, 'vat').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 		let vat_reactor = this.add.image(34 * g_game.DEFS.SCALE, 63 * g_game.DEFS.SCALE, 'vat_reactor').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+
+		let thermo = this.add.image(vat_reactor.x - 16 * g_game.DEFS.SCALE, vat_reactor.y + 52 * g_game.DEFS.SCALE, 'thermo').setOrigin(0, 1).setScale(g_game.DEFS.SCALE*2);
+		this.thermometer = this.add.image(thermo.x + 4 * g_game.DEFS.SCALE, thermo.y - 10 * g_game.DEFS.SCALE, 'thermo_contents').setOrigin(0, 1).setScale(g_game.DEFS.SCALE);
+		this.thermometer.setScale(g_game.DEFS.SCALE, 0.5 * g_game.DEFS.SCALE);
+
 
 		this.tempGuage = this.add.image(vat_reactor.x + 18 * g_game.DEFS.SCALE, vat_reactor.y + 22 * g_game.DEFS.SCALE, 'toxic').setScale(g_game.DEFS.SCALE);
 		this.currentTemp = 50;
@@ -63,6 +67,7 @@ class PlayScene extends Phaser.Scene {
 						easing: 'Quad.easeOut',
 						onComplete: () => {
 							// feed fuel
+							this.feedFuel(this.fuelQueue[0]);
 							this.fuelQueue.shift();
 							this.updateFuelQueue();
 							this.fuelBlocks[0].setRotation(0);
@@ -155,6 +160,12 @@ class PlayScene extends Phaser.Scene {
 			repeat: -1
 		});
 
+		this.sounds = {
+			nada: this.sound.add('nada'),
+			burn: this.sound.add('burn'),
+			hiss: this.sound.add('hiss')
+		};
+
 		this.scene.bringToTop('UIScene');
 
 	}
@@ -180,35 +191,6 @@ class PlayScene extends Phaser.Scene {
 			height: 48 / cellSize,
 			cellSize: cellSize
 		});
-
-		/*let colors = {
-			1: 0x333333,
-			// air
-			10: 0xeeeeee,	// airium
-			// base
-			11: 0xffeb3b,	// hydorium
-			12: 0x259b24,	// oxxum
-			13: 0x90a4ae,	// chlorium
-			14: 0x6d4c41,	// sodaium
-			// compounds
-			15: 0x9575cd,	// 3 neutrium
-			16: 0x03a9f4,	// 2 coolium
-			17: 0x81d4fa,	// 1 freezium
-			18: 0xe51c23,	// 5 flamium
-			19: 0xf06292	// 4 feulium
-		};*/
-
-		/*
-		81d4fa	1
-		00bcd4	2
-		03a9f4	3
-		4e6cef	4
-		8e24aa	5
-		f48fb1	6
-		f06292	7
-		f36c60	8
-		e51c23	9
-		*/
 
 
 		world.registerCellType('water', {
@@ -326,6 +308,29 @@ class PlayScene extends Phaser.Scene {
 		return world;
 	}
 
+	feedFuel(element) {
+
+		if (element.heat === -1) {
+			this.sounds.nada.play();
+		}
+		else {
+			let diff = element.heat - 5;
+			this.currentTemp += diff;
+			console.log(this.currentTemp);
+			if (diff === 0) {
+				this.sounds.nada.play();
+			}
+			else if (diff > 0) {
+				this.sounds.burn.play();
+			}
+			else {
+				this.sounds.hiss.play();
+			}
+			this.updateTempGuage();
+		}
+
+	}
+
 	startValveAnim(valveFuel) {
 		this.valveTween = this.tweens.add({
 			targets: valveFuel,
@@ -344,6 +349,8 @@ class PlayScene extends Phaser.Scene {
 		let color = g_game.DEFS.HEATCOLORS[value-1];
 
 		this.tempGuage.setTint(color);
+
+		this.thermometer.setScale(g_game.DEFS.SCALE, ( this.currentTemp / 90) * g_game.DEFS.SCALE);
 
 	}
 
