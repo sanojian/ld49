@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 		},
 		'http-server': {
 			dev: {
-				root: '',
+				root: 'dist',
 				port: 3116,
 				runInBackground: true
 			}
