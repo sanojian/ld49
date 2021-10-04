@@ -16,16 +16,24 @@ class PlayScene extends Phaser.Scene {
       color: '#333333'
     };
 
+		this.score = 0;
+
 		let world = this.initWorld();
 
-		let vat_reactor = this.add.image(34 * g_game.DEFS.SCALE, 63 * g_game.DEFS.SCALE, 'vat_reactor').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
+		this.vat_reactor = this.add.image(34 * g_game.DEFS.SCALE, 63 * g_game.DEFS.SCALE, 'vat_reactor').setOrigin(0, 0).setScale(g_game.DEFS.SCALE);
 
-		let thermo = this.add.image(vat_reactor.x - 16 * g_game.DEFS.SCALE, vat_reactor.y + 52 * g_game.DEFS.SCALE, 'thermo').setOrigin(0, 1).setScale(g_game.DEFS.SCALE*2);
+		let thermo = this.add.image(this.vat_reactor.x - 16 * g_game.DEFS.SCALE, this.vat_reactor.y + 52 * g_game.DEFS.SCALE, 'thermo').setOrigin(0, 1).setScale(g_game.DEFS.SCALE*2);
 		this.thermometer = this.add.image(thermo.x + 4 * g_game.DEFS.SCALE, thermo.y - 10 * g_game.DEFS.SCALE, 'thermo_contents').setOrigin(0, 1).setScale(g_game.DEFS.SCALE);
 		this.thermometer.setScale(g_game.DEFS.SCALE, 0.5 * g_game.DEFS.SCALE);
 
+		let powerBack = this.add.image(this.vat_reactor.x + 18 * g_game.DEFS.SCALE, this.vat_reactor.y - 12 * g_game.DEFS.SCALE, 'power').setScale(g_game.DEFS.SCALE);
+		style.color = '#fbf236';
+		style.fontSize = '18px';
+		this.scoreText =  this.add.text(powerBack.x + 4 * g_game.DEFS.SCALE, powerBack.y + 7 * g_game.DEFS.SCALE, '0', style).setOrigin(0.5, 1);
+		style.color = '#333333';
+		style.fontSize = '9px';
 
-		this.tempGuage = this.add.image(vat_reactor.x + 18 * g_game.DEFS.SCALE, vat_reactor.y + 22 * g_game.DEFS.SCALE, 'toxic').setScale(g_game.DEFS.SCALE);
+		this.tempGuage = this.add.image(this.vat_reactor.x + 18 * g_game.DEFS.SCALE, this.vat_reactor.y + 22 * g_game.DEFS.SCALE, 'toxic').setScale(g_game.DEFS.SCALE);
 		this.currentTemp = 50;
 		this.updateTempGuage();
 
@@ -34,7 +42,7 @@ class PlayScene extends Phaser.Scene {
 			y: this.sys.game.scale.gameSize.height/2
 		}).setScale(g_game.DEFS.SCALE);
 
-		let valveFuel = this.add.image(vat_reactor.x + 88 * g_game.DEFS.SCALE, vat_reactor.y + 54 * g_game.DEFS.SCALE, 'valve').setOrigin(0.5, 1).setScale(g_game.DEFS.SCALE);
+		let valveFuel = this.add.image(this.vat_reactor.x + 88 * g_game.DEFS.SCALE, this.vat_reactor.y + 54 * g_game.DEFS.SCALE, 'valve').setOrigin(0.5, 1).setScale(g_game.DEFS.SCALE);
 		valveFuel.setInteractive({ useHandCursor: true });
 		valveFuel.on('pointerdown', () => {
 			this.nextFuelBall = 'FUEL';
@@ -44,18 +52,27 @@ class PlayScene extends Phaser.Scene {
 			}
 		});
 
-		this.fuelName = this.add.text(vat_reactor.x + 52 * g_game.DEFS.SCALE, vat_reactor.y + 34 * g_game.DEFS.SCALE, 'test', style).setVisible(false);
+		style.fontSize = '12px';
+		this.fuelName = this.add.text(this.vat_reactor.x + 56 * g_game.DEFS.SCALE, this.vat_reactor.y + 34 * g_game.DEFS.SCALE, 'test', style).setOrigin(0.5, 0.5).setVisible(false);
+
+		style.fontSize = '24px';
+		this.fuelScore = this.add.text(this.fuelName.x, this.fuelName.y - 8 * g_game.DEFS.SCALE , '+16', style).setOrigin(0.5, 0.5).setVisible(false);
+		style.fontSize = '9px';
 
 		this.fuelBlocks = [];
 		this.fuelQueue = [];
 		for (let i = 0; i < 11; i++) {
-			let block = this.add.image(vat_reactor.x + 32 * g_game.DEFS.SCALE + i*5* g_game.DEFS.SCALE, vat_reactor.y + 54 * g_game.DEFS.SCALE, 'block').setOrigin(0, 1).setScale(g_game.DEFS.SCALE).setVisible(false);
+			let block = this.add.image(this.vat_reactor.x + 32 * g_game.DEFS.SCALE + i*5* g_game.DEFS.SCALE, this.vat_reactor.y + 54 * g_game.DEFS.SCALE, 'block').setOrigin(0, 1).setScale(g_game.DEFS.SCALE).setVisible(false);
 			this.fuelBlocks.push(block);
 		}
 
 		this.time.addEvent({
 			delay: 1000,
 			callback: () => {
+				if (this.gameIsOver) {
+					return;
+				}
+
 				this.updateFuelQueue();
 				this.fuelName.setVisible(false);
 				if (this.fuelQueue.length) {
@@ -82,7 +99,7 @@ class PlayScene extends Phaser.Scene {
 
 
 		let chem1ButtonDown = false;
-		let chem1Button = this.add.image(vat_reactor.x + 184 * g_game.DEFS.SCALE, vat_reactor.y + 19 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
+		let chem1Button = this.add.image(this.vat_reactor.x + 184 * g_game.DEFS.SCALE, this.vat_reactor.y + 19 * g_game.DEFS.SCALE, 'chem1_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem2ButtonDown = false;
 		let chem2Button = this.add.image(chem1Button.x, chem1Button.y + 12 * g_game.DEFS.SCALE, 'chem2_source').setScale(g_game.DEFS.SCALE).setOrigin(0, 0);
 		let chem3ButtonDown = false;
@@ -116,6 +133,10 @@ class PlayScene extends Phaser.Scene {
 		this.time.addEvent({
 			delay: 100,
 			callback: () => {
+
+				if (this.gameIsOver) {
+					return;
+				}
 
 				if (this.nextFuelBall) {
 					let valueCount = 0;
@@ -170,6 +191,8 @@ class PlayScene extends Phaser.Scene {
 		});
 
 		this.sounds = {
+			freeze: this.sound.add('freeze'),
+			meltdown: this.sound.add('meltdown'),
 			pour: this.sound.add('pour'),
 			nada: this.sound.add('nada'),
 			burn: this.sound.add('burn'),
@@ -190,6 +213,43 @@ class PlayScene extends Phaser.Scene {
 				this.fuelBlocks[i].setVisible(false);
 			}
 		}
+	}
+
+	gameOver(meltdown) {
+
+		this.gameIsOver = true;
+
+		this.scene.get('UIScene').showGameOver();
+
+		let frameName = meltdown ? 'vat_reactor_meltdown' : 'vat_reactor_shutdown';
+
+		if (meltdown) {
+			this.sounds.meltdown.play();
+		}
+		else {
+			this.sounds.freeze.play();
+		}
+
+		this.vat_reactor.setTexture(frameName + 0);
+		let nextFrame = 1;
+
+		let endAnimation = this.time.addEvent({
+			delay: 1000,
+			callback: () => {
+
+				if (nextFrame > 3) {
+					endAnimation.destroy();
+				}
+				else {
+					this.vat_reactor.setTexture(frameName + nextFrame);
+					nextFrame++;
+				}
+			},
+			callbackScope: this,
+			repeat: -1
+		});
+
+
 	}
 
 	initWorld() {
@@ -326,6 +386,27 @@ class PlayScene extends Phaser.Scene {
 		else {
 			let diff = element.heat - 5;
 			this.currentTemp += diff;
+			if (this.currentTemp <= 0 ||  this.currentTemp >= 90) {
+				this.gameOver(this.currentTemp >= 90);
+				return;
+			}
+			let points = diff > 0 ? diff * diff : 0;
+			this.fuelScore.setText('+' + points).setVisible(true);
+			this.score += points;
+			this.scoreText.setText(this.score);
+			let oy = this.fuelScore.y;
+			this.tweens.add({
+				targets: this.fuelScore,
+				y: oy - 20 * g_game.DEFS.SCALE,
+				duration: 900,
+				ease: 'Power0',
+				onComplete: () => {
+					this.fuelScore.setVisible(false);
+					this.fuelScore.y = oy;
+				},
+				onCompleteScope: this
+			});
+
 			console.log(this.currentTemp);
 			if (diff === 0) {
 				this.sounds.nada.play();

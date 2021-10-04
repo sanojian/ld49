@@ -56,10 +56,61 @@ class UIScene extends Phaser.Scene {
 
     this.add.text(54 * g_game.DEFS.SCALE, 20 * g_game.DEFS.SCALE, 'Chain \n  Reactor', style).setOrigin(0.5, 0.5);
 
+    this.dialog = this.add.image(0, 0, 'dialog').setOrigin(0, 0).setScale(g_game.DEFS.SCALE).setInteractive();
+
+    this.gameOverImage = this.add.image(160 * g_game.DEFS.SCALE, 70 * g_game.DEFS.SCALE, 'game_over').setScale(g_game.DEFS.SCALE).setVisible(false);
+
+    this.retryButton = this.add.image(160 * g_game.DEFS.SCALE, 110 * g_game.DEFS.SCALE, 'retry').setScale(g_game.DEFS.SCALE).setVisible(false);
+    this.retryButton.setInteractive({ useHandCursor: true });
+    this.retryButton.on('pointerdown', () => {
+      location.reload();
+    });
+
+    style.fontSize = '20px';
+    let startText = this.add.text(160 * g_game.DEFS.SCALE, 60 * g_game.DEFS.SCALE, 'make power but\ndon\'t destroy your reactor!', style).setOrigin(0.5);
+    let startButton = this.add.image(160 * g_game.DEFS.SCALE, 100 * g_game.DEFS.SCALE, 'start').setScale(g_game.DEFS.SCALE);
+    startButton.setInteractive({ useHandCursor: true });
+    startButton.on('pointerdown', () => {
+      this.dialog.setVisible(false);
+      startButton.setVisible(false);
+      startText.setVisible(false);
+    }, this);
+
     this.music1 = this.sound.add('music1');
     this.music2 = this.sound.add('music2');
 
+    let currentSong = 'music1';
+    let songPlayCount = 0;
 
-    //this.music2.play({loop: true});
+    this.music1.on('complete', () => {
+      songPlayCount++;
+      if (songPlayCount >= 3) {
+        songPlayCount = 0;
+        this.music2.play();
+      }
+      else {
+        this.music1.play();
+      }
+    }, this);
+
+    this.music2.on('complete', () => {
+      songPlayCount++;
+      if (songPlayCount >= 3) {
+        songPlayCount = 0;
+        this.music1.play();
+      }
+      else {
+        this.music2.play();
+      }
+    }, this);
+
+
+    this.music1.play();
+  }
+
+  showGameOver() {
+    this.dialog.setVisible(true);
+    this.gameOverImage.setVisible(true);
+    this.retryButton.setVisible(true);
   }
 }
